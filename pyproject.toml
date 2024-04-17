@@ -1,0 +1,32 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lsv-recognition"
+version = "0.0.1"
+description = "Recognize up to 10 different gestures of the Venezuelan Sign Language"
+readme = "README.md"
+authors = [{ name = "Carlos Bone", email = "cdbon15@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["OpenCV", "MediaPipe Holistic", "ML", "LSV"]
+dependencies = [
+    "opencv-python <= 4.9.0.80",
+    "scikit-learn <= 1.4.0",
+    "mediapipe <= 0.10.9",
+    "tensorflow <= 2.15.0.post1",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/TSX-Corvo/MotorReconocimientoLSV"
+
+[project.scripts]
+realpython = "reader.__main__:main"
