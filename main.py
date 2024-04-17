@@ -29,8 +29,8 @@ class LSVRecognition:
     def __load_weights__(self):
         self.model.load_weights('models/model.h5')
 
-    def predict(self, sequence):
-        res = self.model.predict(np.expand_dims(sequence, axis=0))
+    def predict(self, sequence: list):
+        res = self.model.predict(np.expand_dims(sequence, axis=0))[0]
         return np.argmax(res, axis=1).tolist()
 
 if __name__ == '__main__':
