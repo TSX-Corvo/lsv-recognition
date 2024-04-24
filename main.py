@@ -129,7 +129,7 @@ class LSVRecognition:
                 cv2.imshow('OpenCV Feed', image)
 
             # Break gracefully
-            if cv2.waitKey(10) & 0xFF == ord('q'):
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             
         cap.release()
@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
     recognition_service.continuous_detection(
         source=0, 
-        output=print, 
+        output=lambda token: print(token), 
         wsl_compatibility=True, 
         show_video=True
     )
