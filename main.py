@@ -6,7 +6,7 @@ from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
 from constants import actions
-from utils import extract_keypoints, mediapipe_detection
+from utils import extract_keypoints, mediapipe_detection, draw_styled_landmarks
 
 class LSVRecognition:
     model: Type[Sequential] = Sequential()
@@ -56,6 +56,7 @@ class LSVRecognition:
         holistic_model = mp.solutions.holistic.Holistic(
             min_detection_confidence=0.5, min_tracking_confidence=0.5
         ),
+        show_video=False
     ):
         """
         Performs continuous detection on a video source and captures frames based on the detection confidence.
@@ -78,23 +79,30 @@ class LSVRecognition:
         # State variables
         predictions = []
         sentence = []
+        sequence = []
 
-      
         while cap.isOpened():
 
             # Read feed
-            _, frame = cap.read()
+            ret, frame = cap.read()
+
+            if not ret:
+                continue
 
             # Make detections
             image, results = mediapipe_detection(frame, holistic_model)
 
-            # Prediction logic
+            if show_video:
+                # Draw landmarks
+                draw_styled_landmarks(image, results)
+
+            #Prediction logic
             keypoints = extract_keypoints(results)
             sequence.append(keypoints)
             sequence = sequence[-29:]
 
             if len(sequence) == 29:
-                res = self.model.predict(np.expand_dims(sequence, axis=0))[0]
+                res = self.model.predict(np.expand_dims(sequence, axis=0), verbose=0)[0]
                 
                 predictions.append(np.argmax(res))
 
@@ -116,7 +124,13 @@ class LSVRecognition:
                     sentence = sentence[-5:]
 
 
+            # Show to screen
+            if show_video:
+                cv2.imshow('OpenCV Feed', image)
+
             # Break gracefully
+            if cv2.waitKey(10) & 0xFF == ord('q'):
+                break
             
         cap.release()
         cv2.destroyAllWindows()
@@ -129,4 +143,9 @@ class LSVRecognition:
 if __name__ == "__main__":
     recognition_service = LSVRecognition()
 
-    recognition_service.continuous_detection(0, print)
+    recognition_service.continuous_detection(
+        source=0, 
+        output=print, 
+        wsl_compatibility=True, 
+        show_video=True
+    )
