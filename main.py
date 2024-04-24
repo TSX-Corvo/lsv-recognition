@@ -1,12 +1,12 @@
 import numpy as np
 import mediapipe as mp
 import cv2
-from typing import Type, Union
+from typing import Type, Union, Callable
 from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
 from constants import actions
-from utils import draw_styled_landmarks, extract_keypoints, mediapipe_detection
+from utils import extract_keypoints, mediapipe_detection
 
 class LSVRecognition:
     model: Type[Sequential] = Sequential()
@@ -40,20 +40,29 @@ class LSVRecognition:
     def predict(self, sequence: list):
         res = self.model.predict(np.expand_dims(sequence, axis=0))[0]
         return np.argmax(res, axis=1).tolist()
+    
+    def __wsl_compatibility__(self, cap: Type[cv2.VideoCapture]):
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        cap.set(cv2.CAP_PROP_FPS, 30)
 
     def continuous_detection(
         self,
         source: Union[int, str],
-        output,
+        output: Callable[[str], None],
         detection_confidence=0.5,
         wsl_compatibility=False,
+        holistic_model = mp.solutions.holistic.Holistic(
+            min_detection_confidence=0.5, min_tracking_confidence=0.5
+        ),
     ):
         """
         Performs continuous detection on a video source and captures frames based on the detection confidence.
 
         Parameters:
-            source (Union[int, str]): The video source, either an integer (0 for default camera) or a string (path to a video file or URL for http stream).
-            output: The output.
+            source: The video source, either an integer (0 for default camera) or a string (path to a video file or URL for http stream).
+            output: Function executed when a gesture is detected, it receives the recognized gesture as parameter.
             detection_confidence (float): The confidence threshold for detection.
 
         Returns:
@@ -64,57 +73,53 @@ class LSVRecognition:
 
         # WSL compatibility trick
         if wsl_compatibility:
-            cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc("M", "J", "P", "G"))
-            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-            cap.set(cv2.CAP_PROP_FPS, 30)
+           self.__wsl_compatibility__(cap)
 
+        # State variables
         predictions = []
         sentence = []
 
-        with mp.solutions.holistic.Holistic(
-            min_detection_confidence=0.5, min_tracking_confidence=0.5
-        ) as holistic:
-            while cap.isOpened():
+      
+        while cap.isOpened():
 
-                # Read feed
-                ret, frame = cap.read()
+            # Read feed
+            _, frame = cap.read()
 
-                # Make detections
-                image, results = mediapipe_detection(frame, holistic)
-                # print(results)
+            # Make detections
+            image, results = mediapipe_detection(frame, holistic_model)
 
-                # Draw landmarks
-                draw_styled_landmarks(image, results)
+            # Prediction logic
+            keypoints = extract_keypoints(results)
+            sequence.append(keypoints)
+            sequence = sequence[-29:]
 
-                # 2. Prediction logic
-                keypoints = extract_keypoints(results)
-                sequence.append(keypoints)
-                sequence = sequence[-29:]
+            if len(sequence) == 29:
+                res = self.model.predict(np.expand_dims(sequence, axis=0))[0]
+                
+                predictions.append(np.argmax(res))
 
-                if len(sequence) == 29:
-                    res = self.model.predict(np.expand_dims(sequence, axis=0))[0]
-                    
-                    predictions.append(np.argmax(res))
+                # Write to output
+                if np.unique(predictions[-10:])[0] == np.argmax(res):
+                    if res[np.argmax(res)] > detection_confidence:
 
-                    # Write to output
-                    if np.unique(predictions[-10:])[0] == np.argmax(res):
-                        if res[np.argmax(res)] > detection_confidence:
+                        detected = actions[np.argmax(res)]
 
-                            if len(sentence) > 0:
-                                if actions[np.argmax(res)] != sentence[-1]:
-                                    sentence.append(actions[np.argmax(res)])
-                            else:
-                                sentence.append(actions[np.argmax(res)])
+                        if len(sentence) > 0:
+                            if detected != sentence[-1]:
+                                sentence.append(detected)
+                                output(detected)
+                        else:
+                            sentence.append(detected)
+                            output(detected)
 
-                    if len(sentence) > 5:
-                        sentence = sentence[-5:]
+                if len(sentence) > 5:
+                    sentence = sentence[-5:]
 
 
-                # Break gracefully
-               
-            cap.release()
-            cv2.destroyAllWindows()
+            # Break gracefully
+            
+        cap.release()
+        cv2.destroyAllWindows()
 
     def stop_detection(self):
         self.cap.release()
@@ -122,4 +127,6 @@ class LSVRecognition:
 
 
 if __name__ == "__main__":
-    recognitionService = LSVRecognition()
+    recognition_service = LSVRecognition()
+
+    recognition_service.continuous_detection(0, print)
