@@ -1,7 +1,5 @@
-from typing import Type
 import numpy as np
-
-
+from typing import Type
 from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
@@ -27,11 +25,11 @@ class LSVRecognition:
         self.model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 
     def __load_weights__(self):
-        self.model.load_weights('models/model.h5')
+        self.model.load_weights('model/model.h5')
 
     def predict(self, sequence: list):
         res = self.model.predict(np.expand_dims(sequence, axis=0))[0]
         return np.argmax(res, axis=1).tolist()
 
 if __name__ == '__main__':
-    pass
+    recognitionService = LSVRecognition()

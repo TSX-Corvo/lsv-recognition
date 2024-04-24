@@ -1,2 +1,3 @@
 build
+__pycache__
 lsv_recognition.egg-info
