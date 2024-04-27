@@ -27,6 +27,3 @@ requires-python = ">=3.8"
 
 [project.urls]
 Homepage = "https://github.com/TSX-Corvo/MotorReconocimientoLSV"
-
-[project.scripts]
-test = "reader.__main__:main"
