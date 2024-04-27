@@ -36,7 +36,7 @@ class LSVRecognition:
         )
 
     def __load_weights__(self):
-        with resources.path('lsvxd.model', 'model.h5') as weights_path:
+        with resources.path('lsvtest.model', 'model.h5') as weights_path:
             self.model.load_weights(str(weights_path))
 
     def predict(self, sequence: list):
