@@ -1,29 +1,91 @@
-# Instrucciones de instalación
+# lsvtest
 
-Versión recomendada de Python: 3.10
+lsvtest es un paquete Python que proporciona funcionalidades para la detección y reconocimiento de LSV (Lenguaje de Señas Venezolano).
 
-Se recomienda la creación de un virtual environment antes de instalar las dependencias:
+## Instalación
 
-Si se tiene conda instalado:
+Puedes instalar `lsvtest` utilizando pip:
 
-`conda create --name venv`  
-`conda activate venv`
+```bash
+pip install lsvtest
+```
 
-O si se desea usar el módulo virtualenv
+Uso
+Para usar lsvtest, sigue estos pasos:
 
-`python -m virtualenv venv`
-`source venv/bin/activate`
+Crear una estructura de proyectoCrea una estructura de proyecto como la siguiente:
 
+```
+project/
+│
+├── main.py
+└── script.py
+```
 
-- Abrir el cuaderno 'Motor de reconocimiento.ipynb' y ejecutar la primera línea del mismo para instalar todas las dependencias requeridas
+Contenido de main.py
 
+```python
+from flask import Flask, jsonify
+import subprocess
 
-# Instrucciones de ejecución
+app = Flask(__name__)
 
-- En el cuarderno 'Motor de reconocimiento.ipynb' Ejecutar todas las celdas una por una hasta la casilla con el texto "Carga del dataset en formato numpy a memoria" (Sin incluir esta última).
+# Variable to keep track of the process
+process = None
 
-- Ejecutar las 2 casillas siguientes al texto "Definición del primer modelo evaluado: LSTM", que son la definición del modelo y el comando que compila al mismo.
+@app.route("/start", methods=["GET"])
+def start_process():
+    global process
+    if process is None:
+        # Replace 'your_command_here' with the command you want to run
+        process = subprocess.Popen(
+            [
+                "python",
+                "-c",
+                'import sys; sys.path.append("."); import script; script.start()',
+            ]
+        )
+        return jsonify({"status": "Process started"}), 200
+    else:
+        return jsonify({"status": "Process is already running"}), 200
 
-- Ejecutar la casilla con el código: `modelLSTM.load_weights('models/LSTM model.h5')`
+@app.route("/stop", methods=["GET"])
+def stop_process():
+    global process
+    if process is not None:
+        process.terminate()  # Sends SIGTERM
+        process = None
+        return jsonify({"status": "Process stopped"}), 200
+    else:
+        return jsonify({"status": "No process is running"}), 200
 
-- Finalmente, ejecutar la penúltima casilla, que está justo luego del texto "Ejecución del Motor de Reconocimiento de la LSV". 
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
+```
+
+Contenido de script.py
+
+```python
+from lsvtest import LSVRecognition
+
+def start():
+    recognition_service = LSVRecognition()
+
+    recognition_service.continuous_detection(
+        source=0, 
+        output=lambda token: print(token), 
+        wsl_compatibility=True, 
+        show_video=True
+    )
+```
+
+Ejecuta el servidor Flask desde la terminal en la carpeta del proyecto:
+```bash
+python main.py
+```
+
+Envía una solicitud GET a http://localhost:5000/start para iniciar el proceso de reconocimiento.
+
+Envía una solicitud GET a http://localhost:5000/stop para detener el proceso de reconocimiento.
+
+Puedes personalizar el reconocimiento modificando los parámetros de continuous_detection en script.py.
