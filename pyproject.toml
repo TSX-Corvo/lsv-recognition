@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lsvtest"
-version = "0.0.1"
+version = "0.0.2"
 description = "Recognize up to 10 signs of the LSV (Venezuelan Sign Language)"
 authors = [{name = "Carlos Bone", email = "cdbon15@gmail.com"}]
 readme = "README.md"
