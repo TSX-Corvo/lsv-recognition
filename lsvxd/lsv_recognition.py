@@ -4,9 +4,10 @@ import cv2
 from typing import Type, Union, Callable
 from keras.models import Sequential
 from keras.layers import LSTM, Dense
+from importlib import resources
 
-from constants import actions
-from utils import extract_keypoints, mediapipe_detection, draw_styled_landmarks
+from .constants import actions
+from .utils import extract_keypoints, mediapipe_detection, draw_styled_landmarks
 
 class LSVRecognition:
     model: Type[Sequential] = Sequential()
@@ -35,7 +36,8 @@ class LSVRecognition:
         )
 
     def __load_weights__(self):
-        self.model.load_weights("model/model.h5")
+        with resources.path('lsvxd.model', 'model.h5') as weights_path:
+            self.model.load_weights(str(weights_path))
 
     def predict(self, sequence: list):
         res = self.model.predict(np.expand_dims(sequence, axis=0))[0]
