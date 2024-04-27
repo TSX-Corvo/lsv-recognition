@@ -15,7 +15,7 @@ setup(
     description='Recognize up to 10 different gestures of the Venezuelan Sign Language',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/TSX-Corvo/MotorReconocimientoLSV',
+    url='https://github.com/TSX-Corvo/lsv-recognition',
     license='MIT',
     classifiers=[
         'License :: OSI Approved :: MIT License',
