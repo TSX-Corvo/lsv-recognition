@@ -1,21 +1,14 @@
-# pyproject.toml
-
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
 [project]
-name = "lsv-recognition"
-version = "0.0.5"
-description = "Recognize up to 10 different gestures of the Venezuelan Sign Language"
+name = "lsvxd"
+authors = [{name = "Carlos Bone", email = "cdbon15@gmail.com"}]
 readme = "README.md"
-authors = [{ name = "Carlos Bone", email = "cdbon15@gmail.com" }]
-license = { file = "LICENSE" }
-classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-]
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: MIT License"]
+dynamic = ["version", "description"]
 keywords = ["OpenCV", "MediaPipe Holistic", "ML", "LSV"]
 dependencies = [
     "mediapipe >= 0.10.11",
@@ -28,4 +21,4 @@ dependencies = [
 requires-python = ">=3.8"
 
 [project.urls]
-Homepage = "https://github.com/TSX-Corvo/lsv-recognition"
+Home = "https://github.com/TSX-Corvo/lsv-recognition"
