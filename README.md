@@ -89,3 +89,13 @@ Envía una solicitud GET a http://localhost:5000/start para iniciar el proceso d
 Envía una solicitud GET a http://localhost:5000/stop para detener el proceso de reconocimiento.
 
 Puedes personalizar el reconocimiento modificando los parámetros de continuous_detection en script.py.
+
+## Problemas al instalar
+
+Si tienes problemas al momento de instalar el paquete, prueba ejecutar primero:
+
+```bash
+pip install mediapipe opencv-python scikit-learn  tensorflow  
+```
+
+Y luego prueba a instalar el paquete nuevamente

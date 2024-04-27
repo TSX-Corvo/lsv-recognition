@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lsvxd"
+name = "lsvtest"
 version = "0.0.1"
-description = "xd"
+description = "Recognize up to 10 signs of the LSV (Venezuelan Sign Language)"
 authors = [{name = "Carlos Bone", email = "cdbon15@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
