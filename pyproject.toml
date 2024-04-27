@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lsvxd"
+version = "0.0.1"
 description = "xd"
 authors = [{name = "Carlos Bone", email = "cdbon15@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
-dynamic = ["version"]
 keywords = ["OpenCV", "MediaPipe Holistic", "ML", "LSV"]
 dependencies = [
     "mediapipe >= 0.10.11",
