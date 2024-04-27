@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lsv-recognition"
-version = "0.0.1"
+version = "0.0.5"
 description = "Recognize up to 10 different gestures of the Venezuelan Sign Language"
 readme = "README.md"
 authors = [{ name = "Carlos Bone", email = "cdbon15@gmail.com" }]
@@ -18,10 +18,12 @@ classifiers = [
 ]
 keywords = ["OpenCV", "MediaPipe Holistic", "ML", "LSV"]
 dependencies = [
-    "opencv-python <= 4.9.0.80",
-    "scikit-learn <= 1.4.0",
-    "mediapipe <= 0.10.9",
-    "tensorflow <= 2.15.0.post1",
+    "mediapipe >= 0.10.11",
+    "opencv-contrib-python >= 4.9.0.80",
+    "opencv-python >= 4.9.0.80",
+    "scikit-learn >= 1.4.2",
+    "tensorflow >= 2.16.1",
+    "tensorflow-io-gcs-filesystem >= 0.36.0"
 ]
 requires-python = ">=3.8"
 
